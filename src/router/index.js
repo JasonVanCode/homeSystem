@@ -41,9 +41,15 @@ export default new Router({
                 },
                 {
                     // 富文本编辑器组件
-                    path: '/editor',
+                    path: '/editoredit',
                     component: () => import(/* webpackChunkName: "editor" */ '../components/page/VueEditor.vue'),
-                    meta: { title: '富文本编辑器' }
+                    meta: { title: '文章编辑' }
+                },
+                {
+                    // 富文本编辑器组件
+                    path: '/editorlist',
+                    component: () => import(/* webpackChunkName: "editor" */ '../components/page/EditorList.vue'),
+                    meta: { title: '文章列表' }
                 },
                 {
                     // markdown组件
@@ -120,7 +126,12 @@ export default new Router({
                 {
                     path: '/baidumap',
                     component: () => import(/* webpackChunkName: "donate" */ '../components/page/BaiduMap.vue'),
-                    meta: { title: 'switch游戏' }
+                    meta: { title: '百度地图' }
+                },
+                {
+                    path: '/chat',
+                    component: () => import(/* webpackChunkName: "donate" */ '../components/page/Chat.vue'),
+                    meta: { title: '在线聊天' }
                 }
             ]
         },

@@ -8,7 +8,8 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
-    "axios": "^0.18.0",
+    "@fortawesome/free-solid-svg-icons": "^5.15.3",
+    "axios": "^0.21.1",
     "babel-polyfill": "^6.26.0",
     "element-china-area-data": "^4.1.2",
     "element-ui": "^2.11.0",
@@ -16,8 +17,10 @@
     "vue": "^2.6.10",
     "vue-axios": "^2.1.5",
     "vue-baidu-map": "^0.21.22",
+    "vue-beautiful-chat": "^2.5.0",
     "vue-cropperjs": "^3.0.0",
     "vue-i18n": "^8.10.0",
+    "vue-puzzle-vcode": "^1.1.5",
     "vue-quill-editor": "^3.0.6",
     "vue-router": "^3.0.3",
     "vue-schart": "^2.0.0",
@@ -26,7 +29,7 @@
     "websocket-extensions": "^0.1.4"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.9.0",
+    "@vue/cli-plugin-babel": "^3.12.1",
     "@vue/cli-service": "^4.4.0",
     "vue-template-compiler": "^2.6.10"
   }

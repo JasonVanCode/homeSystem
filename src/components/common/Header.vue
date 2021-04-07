@@ -29,7 +29,8 @@
                 </div>
                 <!-- 用户头像 -->
                 <div class="user-avator">
-                    <img src="http://192.168.8.159:8091/headimgs/head.jpg" />
+                    <!-- http://192.168.8.159:8091/headimgs/head.jpg -->
+                    <img src="" />
                 </div>
                 <!-- 用户名下拉菜单 -->
                 <el-dropdown class="user-name" trigger="click" @command="handleCommand">
@@ -74,17 +75,11 @@ export default {
         handleCommand(command) {
             let self = this;
             if (command == 'loginout') {
-                loginOut().then(res => {
-                    if(res.code == 200){
-                        localStorage.removeItem('ms_username');
-                        localStorage.removeItem('menulist');
-                        localStorage.removeItem('token');
-                        self.$router.push('/login');
-                    }else{
-                        self.$message.error('退出登录失败，请重新操作');
-                    }
-                });
-                
+                loginOut();
+                localStorage.removeItem('ms_username');
+                localStorage.removeItem('menulist');
+                localStorage.removeItem('token');
+                self.$router.push('/login');
             }
         },
         // 侧边栏折叠

@@ -24,6 +24,8 @@ const i18n = new VueI18n({
     locale: 'zh',
     messages
 });
+import Chat from 'vue-beautiful-chat';
+Vue.use(Chat);
 
 
 //使用钩子函数对路由进行权限跳转

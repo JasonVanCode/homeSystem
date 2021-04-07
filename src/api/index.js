@@ -97,3 +97,19 @@ export function loginOut(data){
         data: data
     });
 }
+
+//富文本编辑器
+export function blogSave(data){
+    return request({
+        url: '/blog/save',
+        data: data
+    });
+}
+
+export function blogList(data){
+    return request({
+        url: '/blog/getlist',
+        params: data,
+        method: 'get',
+    });
+}

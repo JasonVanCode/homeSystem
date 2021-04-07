@@ -9,10 +9,10 @@ module.exports = {
             errors: true
         },
         open: false, // 是否打开浏览器
-        host: "192.168.8.159",
+        host: "0.0.0.0",
         port: "8888", // 代理断就
         https: false,
-        hotOnly: false, // 热更新
+        hotOnly: true, // 热更新
         //下面可以通过代理的方式可以解决跨域问题
         //此次项目当中我是通过后端cors的方式解决跨域的问题的
         // proxy: {

@@ -18,6 +18,9 @@
                         <el-button slot="prepend" icon="el-icon-lx-lock"></el-button>
                     </el-input>
                 </el-form-item>
+                <el-form-item >
+                    <Vcode :show="isShow" @success="success" @close="close" />
+                </el-form-item>
                 <div class="login-btn">
                     <el-button type="primary" @click="submitForm()">登录</el-button>
                 </div>
@@ -29,6 +32,7 @@
      
 <script>
 import { Login } from '../../api/index';
+import Vcode from "vue-puzzle-vcode";
 export default {
     data: function() {
         return {
@@ -40,27 +44,41 @@ export default {
                 name: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
                 password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
             },
+            isShow: false, // 验证码模态框是否出现
         };
+    },
+    components: {
+        Vcode,
     },
     methods: {
         submitForm() {
             let self = this;
             self.$refs.login.validate(valid => {
             if (valid) {
-                Login(self.param).then(res => {
-                    console.log(res);
-                    if(res.code == 200){
-                        self.$message.success(res.msg);
-                        localStorage.setItem('ms_username', self.param.name);
-                        localStorage.setItem('token',res.result.token);
-                        self.$router.push('/');
-                    }
-                });
+                self.isShow = true;
             }else{
-                    self.$message.error('请输入账号和密码');
-                    return false;
+                self.$message.error('请输入账号和密码');
+                return false;
             }
             });
+        },
+        // 用户通过了验证
+        success(msg) {
+            let self = this;
+            self.isShow = false; // 通过验证后，需要手动隐藏模态框
+            Login(self.param).then(res => {
+                console.log(res);
+                if(res.code == 200){
+                    self.$message.success(res.msg);
+                    localStorage.setItem('ms_username', self.param.name);
+                    localStorage.setItem('token',res.result.token);
+                    self.$router.push('/');
+                }
+            });
+        },
+        // 用户点击遮罩层，应该关闭模态框
+        close() {
+            this.isShow = false;
         },
     },
 };
@@ -71,7 +89,8 @@ export default {
     position: relative;
     width: 100%;
     height: 100%;
-    background-image: url(../../assets/img/login-bg.jpg);
+    /* background-image: url(../../assets/img/login-bg.jpg); */
+    background-color:#2d3a4b;
     background-size: 100%;
 }
 .ms-title {
