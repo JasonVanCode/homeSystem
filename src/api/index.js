@@ -113,3 +113,18 @@ export function blogList(data){
         method: 'get',
     });
 }
+
+export function blogEditList(data){
+    return request({
+        url: '/blog/geteditlist',
+        params: data,
+        method: 'get',
+    });
+}
+
+export function blogDel(data){
+    return request({
+        url: '/blog/dellist',
+        data: data
+    });
+}

@@ -42,6 +42,7 @@ export default new Router({
                 {
                     // 富文本编辑器组件
                     path: '/editoredit',
+                    name:'editoredit',
                     component: () => import(/* webpackChunkName: "editor" */ '../components/page/VueEditor.vue'),
                     meta: { title: '文章编辑' }
                 },

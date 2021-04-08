@@ -14,10 +14,10 @@
 
                 <el-form-item label="文章类型"  label-width="70px" prop="type">
                     <el-select v-model="ruleForm.type" placeholder="请选择"  clearable> 
-                        <el-option label="类型1" value="类型1"></el-option>
-                        <el-option label="类型2" value="类型1"></el-option>
-                        <el-option label="类型3" value="类型1"></el-option>
-                        <el-option label="类型4" value="类型1"></el-option>
+                        <el-option label="Linux" value="Linux"></el-option>
+                        <el-option label="PHP" value="PHP"></el-option>
+                        <el-option label="Mysql" value="Mysql"></el-option>
+                        <el-option label="Redis" value="Redis"></el-option>
                     </el-select>
                  </el-form-item>
              </el-form>
@@ -33,11 +33,12 @@
     import 'quill/dist/quill.snow.css';
     import 'quill/dist/quill.bubble.css';
     import { quillEditor } from 'vue-quill-editor';
-    import {blogSave} from '../../api/index.js';
+    import {blogSave,blogEditList} from '../../api/index.js';
     export default {
         name: 'editor',
         data: function(){
             return {
+                editid:null,
                 content: '',
                 editorOption: {
                     placeholder: 'Hello World'
@@ -56,10 +57,28 @@
                 }
             }
         },
+        created() {
+            console.log(this.$route);
+            if(this.$route.query.id){
+                this.editid = this.$route.query.id;
+                this.getEditdata( this.editid );
+            }
+        },
         components: {
             quillEditor
         },
         methods: {
+            getEditdata(id){
+                let self = this;
+                blogEditList({
+                    id:id
+                }).then(res => {
+                    let result = res.result;
+                    self.content = result.article_content;
+                    self.ruleForm.name = result.article_title;
+                    self.ruleForm.type = result.article_type;
+                });
+            },
             onEditorChange({ editor, html, text }) {
                 this.content = html;
                 // console.log(this.content);

@@ -262,6 +262,7 @@ export default {
             let len = self.multipleSelection.length;
             if(len == 0){
                 self.$message.error('请选择要删除的数据');
+                return;
             }
             let id = [];
              // 二次确认删除
