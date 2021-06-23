@@ -30,7 +30,7 @@
                 <!-- 用户头像 -->
                 <div class="user-avator">
                     <!-- http://192.168.8.159:8091/headimgs/head.jpg -->
-                    <img src="" />
+                    <img :src="avatar" />
                 </div>
                 <!-- 用户名下拉菜单 -->
                 <el-dropdown class="user-name" trigger="click" @command="handleCommand">
@@ -61,25 +61,23 @@ export default {
             collapse: false,
             fullscreen: false,
             name: 'linxin',
-            message: 2
+            message: 2,
+            hostname:null,
+            username:null,
+            avatar:null
         };
     },
     computed: {
-        username() {
-            let username = localStorage.getItem('ms_username');
-            return username ? username : this.name;
-        }
     },
     methods: {
         // 用户名下拉菜单选择事件
         handleCommand(command) {
             let self = this;
             if (command == 'loginout') {
-                loginOut();
-                localStorage.removeItem('ms_username');
-                localStorage.removeItem('menulist');
-                localStorage.removeItem('token');
-                self.$router.push('/login');
+                loginOut().then(res => {
+                    self.tool.clearCookie('userinfo');
+                    self.$router.push('/login');
+                });
             }
         },
         // 侧边栏折叠
@@ -116,6 +114,9 @@ export default {
         }
     },
     mounted() {
+        let userinfo = JSON.parse(this.tool.getCookie('userinfo'));
+        this.username = userinfo.name;
+        this.avatar = this.image_host + userinfo.avatar;
         if (document.body.clientWidth < 1500) {
             this.collapseChage();
         }

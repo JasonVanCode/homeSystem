@@ -21,18 +21,14 @@
                     </el-select>
                  </el-form-item>
              </el-form>
-
-            <quill-editor ref="myTextEditor" v-model="content" :options="editorOption"  @change="onEditorChange($event)"></quill-editor>
+             {{content}}
+             <mavon-editor v-model="content" :ishljs = "true" @imgAdd="imgAdd" />
             <el-button class="editor-btn" type="primary" @click="submit">提交</el-button>
         </div>
     </div>
 </template>
 
 <script>
-    import 'quill/dist/quill.core.css';
-    import 'quill/dist/quill.snow.css';
-    import 'quill/dist/quill.bubble.css';
-    import { quillEditor } from 'vue-quill-editor';
     import {blogSave,blogEditList} from '../../api/index.js';
     export default {
         name: 'editor',
@@ -65,7 +61,6 @@
             }
         },
         components: {
-            quillEditor
         },
         methods: {
             getEditdata(id){
@@ -105,6 +100,10 @@
                     }
                 });
                 // this.$message.success('提交成功！');
+            },
+            imgAdd()
+            {
+                alert(333);
             }
         }
     }

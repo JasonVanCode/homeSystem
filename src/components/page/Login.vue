@@ -50,6 +50,9 @@ export default {
     components: {
         Vcode,
     },
+    mounted:function(){
+
+    },
     methods: {
         submitForm() {
             let self = this;
@@ -63,17 +66,19 @@ export default {
             });
         },
         // 用户通过了验证
-        success(msg) {
+        success() {
             let self = this;
             self.isShow = false; // 通过验证后，需要手动隐藏模态框
             Login(self.param).then(res => {
                 console.log(res);
-                if(res.code == 200){
-                    self.$message.success(res.msg);
-                    localStorage.setItem('ms_username', self.param.name);
-                    localStorage.setItem('token',res.result.token);
-                    self.$router.push('/');
+                //如果服务端没有返回token，说明该账户不存在
+                if(!res.result.token){
+                    self.$message.error('该账户不存在');
+                    return;
                 }
+                self.tool.setCookie('userinfo',JSON.stringify({name:self.param.name,token:res.result.token,last_logintime:res.result.last_logintime,avatar:res.result.avatar}));
+                self.$message.success('登录成功');
+                self.$router.push('/');
             });
         },
         // 用户点击遮罩层，应该关闭模态框

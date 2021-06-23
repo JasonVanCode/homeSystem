@@ -1,9 +1,10 @@
 import axios from 'axios';
 import qs from 'qs';
 import router from '../router';
-
+import tool from '../cookie/index';
 //关于前后端分离跨域问题
 //由于自定义header之后，axios默认多了一个 请求方法是 option ，而后台对于option的请求方法没有设置跨域允许，所以会出现请求失败报错问题
+
 const service = axios.create({
     timeout: 70000, // 请求超时时间
     baseURL: process.env.VUE_APP_API,
@@ -19,8 +20,10 @@ service.interceptors.request.use(
         if(config.headers['Content-Type'] == 'application/x-www-form-urlencoded'){
             config.data = qs.stringify(config.data);
         }
-        if(window.localStorage.getItem('token')){
-            config.headers['Authorization'] = window.localStorage.getItem('token');
+        let userinfo = tool.getCookie('userinfo')?JSON.parse(tool.getCookie('userinfo')):'';
+
+        if(userinfo && userinfo.token){
+            config.headers['Authorization'] = userinfo.token;
         }
         return config;
     },

@@ -35,8 +35,8 @@
                     <template slot-scope="scope">
                         <el-image
                             class="table-td-thumb"
-                            :src="scope.row.avatar"
-                            :preview-src-list="[scope.row.avatar]"
+                            :src="hostname + scope.row.avatar"
+                            :preview-src-list="[hostname + scope.row.avatar]"
                         ></el-image>
                     </template>
                 </el-table-column>
@@ -86,8 +86,8 @@
         <!-- 编辑弹出框 -->
         <el-dialog title="新增" :visible.sync="editVisible" width="30%">
             <el-form ref="form" :model="form" label-width="70px" :rules="rules">
-                <el-form-item label="账号" prop="username">
-                    <el-input v-model="form.username"></el-input>
+                <el-form-item label="账号1" prop="username">
+                    <el-input v-model="form.username" :disabled="form.user_id?true:false"></el-input>
                 </el-form-item>
                 <el-form-item label="密码" prop="password">
                     <el-input v-model="form.password" show-password></el-input>
@@ -195,10 +195,12 @@ export default {
             },
             idx: -1,
             id: -1,
-            imageUrl:null
+            imageUrl:null,
+            hostname:null
         };
     },
     created() {
+        this.hostname = 'http://'+window.location.hostname+':8091/'
         this.getData();
         this.getRolelist();
     },
@@ -294,6 +296,7 @@ export default {
         handleEdit(index, row) {
             this.idx = index;
             console.log(row);
+            this.imageUrl = null;
             this.form = {
                 user_id:row.user_id,
                 username:row.username,

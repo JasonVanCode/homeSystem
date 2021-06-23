@@ -4,7 +4,7 @@
             <el-col :span="8">
                 <el-card shadow="hover" class="mgb20" style="height:252px;">
                     <div class="user-info">
-                        <img src="" class="user-avator" alt />
+                        <img :src="image_host + userinfo.avatar" class="user-avator" alt />
                         <div class="user-info-cont">
                             <div class="user-info-name">{{name}}</div>
                             <div>{{role}}</div>
@@ -12,7 +12,7 @@
                     </div>
                     <div class="user-info-list">
                         上次登录时间：
-                        <span>2019-11-01</span>
+                        <span>{{userinfo.last_logintime}}</span>
                     </div>
                     <div class="user-info-list">
                         上次登录地点：
@@ -137,12 +137,16 @@
 <script>
 import Schart from 'vue-schart';
 import bus from '../common/bus';
+import wsConnection from '../../websocket';
 
 export default {
     name: 'dashboard',
     data() {
         return {
-            name: localStorage.getItem('ms_username'),
+            name:null,
+            role:null,
+            userinfo:{},
+            token:null,
             todoList: [
                 {
                     title: '今天要修复100个bug',
@@ -295,13 +299,16 @@ export default {
         Schart
     },
     computed: {
-        role() {
-            return this.name === 'admin' ? '超级管理员' : '普通用户';
-        }
     },
     created() {
+        this.userinfo = JSON.parse(this.tool.getCookie('userinfo'));
+        console.log(this.userinfo);
+        this.role = this.userinfo.name === 'admin'?'超级管理员':'普通用户';
+        console.log(wsConnection);
         this.handleListener();
         this.changeDate();
+        //连接websocket服务
+        // this.wsConnect();
     },
     activated() {
         this.handleListener();
@@ -342,8 +349,9 @@ export default {
             // called when the user sends a message
             this.messageList = [ ...this.messageList, message ]
         },
+        // called when the user clicks on the fab button to open the chat
+        //当用户单击按钮打开聊天时调用
         openChat () {
-            // called when the user clicks on the fab button to open the chat
             this.isChatOpen = true
             this.newMessagesCount = 0
         },
@@ -362,35 +370,6 @@ export default {
             const m = this.messageList.find(m=>m.id === message.id);
             m.isEdited = true;
             m.data.text = message.data.text;
-        },
-        wsConnect()
-        {
-            try {
-                this.ws = new WebSocket("ws://192.168.8.102:9501");
-            } catch (error) {
-                console.log(error.message);
-                return false;
-            }
-            this.wsOpen();
-            this.wsMessage();
-            this.wsClose();
-        },
-        wsOpen(){
-            this.ws.onopen = function() {
-                console.log("client：打开连接");
-                this.ws.send("client：hello，服务端");
-            };
-        },
-        wsMessage(){
-            this.ws.onmessage = function(e) {
-                console.log("client：接收到服务端的消息 " + e.data);
-            };
-        },
-        wsClose()
-        {
-            this.ws.onclose = function(params){
-                console.log("client：关闭连接");
-            };
         }
     }
 };
