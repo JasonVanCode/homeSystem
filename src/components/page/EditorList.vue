@@ -121,7 +121,7 @@ export default {
                 type: 'warning'
             })
                 .then(() => {
-                    userDel({id:row.article_id}).then(res => {
+                    blogDel({id:row.article_id}).then(res => {
                         this.getData();
                         if(res.result.status == 'success'){
                             this.$message.success('删除成功');
