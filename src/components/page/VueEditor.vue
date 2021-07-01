@@ -21,15 +21,14 @@
                     </el-select>
                  </el-form-item>
              </el-form>
-             {{content}}
-             <mavon-editor v-model="content" :ishljs = "true" @imgAdd="imgAdd" />
+             <mavon-editor v-model="content" :ishljs = "true" @imgAdd="imgAdd"  ref=md />
             <el-button class="editor-btn" type="primary" @click="submit">提交</el-button>
         </div>
     </div>
 </template>
 
 <script>
-    import {blogSave,blogEditList} from '../../api/index.js';
+    import {blogSave,blogEditList,blogImgSave} from '../../api/index.js';
     export default {
         name: 'editor',
         data: function(){
@@ -86,7 +85,7 @@
                 }
                 self.$refs['ruleForm'].validate((valid) => {
                     if (valid) {
-                        blogSave({name:self.ruleForm.name,type:self.ruleForm.type,content:self.content}).then(res => {
+                        blogSave({name:self.ruleForm.name,type:self.ruleForm.type,content:self.content,editid:self.editid}).then(res => {
                             console.log(res);
                             if(res.msg == 'success'){
                                 self.$message.success('添加成功！');
@@ -101,9 +100,19 @@
                 });
                 // this.$message.success('提交成功！');
             },
-            imgAdd()
+            imgAdd(pos, $file)
             {
-                alert(333);
+                // 第一步.将图片上传到服务器.
+                let self = this;
+                let formdata = new FormData();
+                formdata.append('file', $file);
+                blogImgSave(formdata).then(res=>{
+                    console.log(res.data);
+                    if(res.msg == 'success'){
+                        let url = self.image_host + res.result.imgurl;
+                        self.$refs.md.$img2Url(pos, url);
+                    }
+                });
             }
         }
     }

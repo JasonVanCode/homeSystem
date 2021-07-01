@@ -128,3 +128,23 @@ export function blogDel(data){
         data: data
     });
 }
+
+
+export function blogImgSave(data){
+    return request({
+        url: '/blog/blogimgsave',
+        data: data,
+        headers: {
+            "Content-Type": "multipart/form-data"
+        }
+    });
+}
+
+//在线聊天模块
+export function getChatUserlist(data){
+    return request({
+        url: '/chat/get_chat_userlist',
+        params: data,
+        method: 'get'
+    });
+}

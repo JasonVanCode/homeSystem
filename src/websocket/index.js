@@ -1,33 +1,38 @@
 
 let wsConnection = {
+  $wsurl:null,
   $ws: null,
+  $initdata:null,
   lockReturn: false,
-  timeout: 60 * 1000 * 5,
+  timeout: 60 * 1000 * 2,
   timeoutObj: null,
   timeoutNum: null,
   serverTimeoutObj: null,
   //初始化webSocket长连接
-  initWebSocket: function (url) {
-    this.$ws = new WebSocket(url);//写入地址 这里的地址可以在initWebSocket方法加入参数
+  initWebSocket: function () {
+    this.$ws = new WebSocket(this.$wsurl);//写入地址 这里的地址可以在initWebSocket方法加入参数
     this.$ws.onopen = this.wsOpen;
     this.$ws.onclose = this.wsClose;
-    this.$ws.onmessage = this.wsMsg;
+    // this.$ws.onmessage = this.wsMsg;
     this.$ws.onerror = this.wsError;
   },
   //打开websocket
   wsOpen: function (e) {
+    //给后台发送初始化的数据
+    let msg = JSON.stringify(wsConnection.$initdata);
+    wsConnection.$ws.send(msg);
     //开始websocket心跳
     wsConnection.startWsHeartbeat();
-    console.log('ws success')
   },
   wsClose: function (e) {
     console.log(e, 'ws close')
   },
-  wsMsg: function (msg) {
+  wsMsg: function (e) {
     //每次接收到服务端消息后 重置websocket心跳
     wsConnection.resetHeartbeat();
+    console.log('接收到服务器返回的数据'+e.data);
     //服务端发送来的消息存到vuex
-    store.commit('web_socket_msg', msg)
+    // store.commit('web_socket_msg', msg)
   },
   wsError: function (err) {
     console.log(err, 'ws error');
@@ -49,7 +54,6 @@ let wsConnection = {
   startWsHeartbeat: function () {
     let _this = this;
     _this.timeoutObj && clearTimeout(_this.timeoutObj);
-    _this.serverTimeoutObj && clearTimeout(_this.serverTimeoutObj);
     _this.timeoutObj = setInterval(function () {
       //判断websocket当前状态
       if (_this.$ws.readyState != 1) {
@@ -61,7 +65,6 @@ let wsConnection = {
   resetHeartbeat: function () {
     let _this = this;
     clearTimeout(_this.timeoutObj);
-    clearTimeout(_this.serverTimeoutObj);
     _this.startWsHeartbeat()
   }
 };

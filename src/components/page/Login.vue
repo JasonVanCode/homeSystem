@@ -76,7 +76,7 @@ export default {
                     self.$message.error('该账户不存在');
                     return;
                 }
-                self.tool.setCookie('userinfo',JSON.stringify({name:self.param.name,token:res.result.token,last_logintime:res.result.last_logintime,avatar:res.result.avatar}));
+                self.tool.setCookie('userinfo',JSON.stringify({name:self.param.name,token:res.result.token,last_logintime:res.result.last_logintime,avatar:res.result.avatar,user_id:res.result.user_id}));
                 self.$message.success('登录成功');
                 self.$router.push('/');
             });

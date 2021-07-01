@@ -107,6 +107,7 @@
             </el-col>
         </el-row>
         <div>
+          
             <beautiful-chat
                 :participants="participants"
                 :titleImageUrl="titleImageUrl"
@@ -128,7 +129,23 @@
                 :disableUserListToggle="false"
                 :messageStyling="messageStyling"
                 @onType="handleOnType"
-                @edit="editMessage" />
+                @edit="editMessage" >
+                    <template v-slot:user-avatar="{ message }">
+                            <!-- {{message}} -->
+                            <div style="border-radius:50%; color: pink; font-size: 15px; line-height:25px; text-align:center;background: tomato; width: 25px !important; height: 25px !important; min-width: 30px;min-height: 30px;margin: 5px; font-weight:bold" v-if="message.type === 'text' ">
+                                {{'jj'}}
+                            </div>
+                    </template>
+                    <template v-slot:text-message-body="{ message }">
+                        {{message}}
+                        <small style="background:red" v-if="message.meta">
+                            {{message.meta}}
+                        </small>
+                        <small style="background:red">
+                            {{message.data.text}}
+                        </small>
+                    </template>
+                </beautiful-chat>
         </div>
 
     </div>
@@ -138,6 +155,7 @@
 import Schart from 'vue-schart';
 import bus from '../common/bus';
 import wsConnection from '../../websocket';
+import {getChatUserlist} from '../../api/index';
 
 export default {
     name: 'dashboard',
@@ -246,22 +264,19 @@ export default {
                     }
                 ]
             },
+            //其他用户的信息
             participants: [
-                {
-                id: 'user1',
-                name: 'Matteo',
-                imageUrl: 'https://avatars3.githubusercontent.com/u/1915989?s=230&v=4'
-                },
-                {
-                id: 'user2',
-                name: 'Support',
-                imageUrl: 'https://avatars3.githubusercontent.com/u/37018832?s=200&v=4'
-                }
+                // {
+                // id: 'user1',
+                // name: 'Matteo',
+                // imageUrl: 'https://avatars3.githubusercontent.com/u/1915989?s=230&v=4'
+                // }
             ], // the list of all the participant of the conversation. `name` is the user name, `id` is used to establish the author of a message, `imageUrl` is supposed to be the user avatar.
-            titleImageUrl: 'https://a.slack-edge.com/66f9/img/avatars-teams/ava_0001-34.png',
+            //当前登录系统的图片
+            titleImageUrl: '',
             messageList: [
-                { type: 'text', author: `me`, data: { text: `Say yes!` } },
-                { type: 'text', author: `user1`, data: { text: `No.` } }
+                { type: 'text', author: `me`, data: { text: `Say yes!` },user_id:1},
+                { type: 'text', author: `other`, data: { text: `No.` },user_id:2 }
             ], // the list of the messages to show, can be paginated and adjusted dynamically
             newMessagesCount: 1, //新消息提醒
             isChatOpen: false, // to determine whether the chat window should be open or closed
@@ -300,15 +315,13 @@ export default {
     },
     computed: {
     },
+    watch:{
+    },
     created() {
         this.userinfo = JSON.parse(this.tool.getCookie('userinfo'));
-        console.log(this.userinfo);
         this.role = this.userinfo.name === 'admin'?'超级管理员':'普通用户';
-        console.log(wsConnection);
         this.handleListener();
         this.changeDate();
-        //连接websocket服务
-        // this.wsConnect();
     },
     activated() {
         this.handleListener();
@@ -339,21 +352,35 @@ export default {
             this.$refs.bar.renderChart();
             this.$refs.line.renderChart();
         },
-        sendMessage (text) {
-            if (text.length > 0) {
-                this.newMessagesCount = this.isChatOpen ? this.newMessagesCount : this.newMessagesCount + 1
-                this.onMessageWasSent({ author: 'support', type: 'text', data: { text } })
-            }
-        },
         onMessageWasSent (message) {
             // called when the user sends a message
+            message.user_id = this.userinfo.user_id;
             this.messageList = [ ...this.messageList, message ]
+            //websocket发送消息
+            wsConnection.$ws.send(JSON.stringify(message));
         },
         // called when the user clicks on the fab button to open the chat
         //当用户单击按钮打开聊天时调用
         openChat () {
+        // wsConnection.initWebSocket('ws://192.168.137.95:9501');
+            let self = this;
             this.isChatOpen = true
             this.newMessagesCount = 0
+            //获取用户的数据
+            getChatUserlist().then(res => {
+                console.log(res);
+                let result = res.result;
+                self.titleImageUrl = self.image_host + result.me.imageUrl;
+                self.participants = result.other;
+            });
+            //连接服务端websocket服务
+            if(!wsConnection.$ws){
+                wsConnection.$initdata = {is_first_connect:1,user_id:self.userinfo.user_id};
+                wsConnection.$wsurl = 'ws://192.168.137.95:9501';
+                wsConnection.initWebSocket();
+            }
+            //websocket获取到消息
+            wsConnection.$ws.onmessage = self.onMsg;
         },
         closeChat () {
             // called when the user clicks on the botton to close the chat
@@ -364,19 +391,35 @@ export default {
             // leverage pagination for loading another page of messages
         },
         handleOnType () {
-            console.log('Emit typing event')
+            console.log('Emit typing event');
         },
         editMessage(message){
             const m = this.messageList.find(m=>m.id === message.id);
             m.isEdited = true;
             m.data.text = message.data.text;
+        },
+        onMsg(e){
+            let self = this;
+            console.log(e.data);
+            let receiveMsg = JSON.parse(e.data);
+            self.messageList.push({ type: 'text', author: `other`, data: { text:  receiveMsg.msg},user_id:receiveMsg.send_user_id});
+            self.newMessagesCount = self.isChatOpen ? self.newMessagesCount : self.newMessagesCount + 1
         }
+
     }
 };
 </script>
 
-
+  <style type="text/css">
+                .sc-header--img[data-v-61edfd75] {
+                    width:50px !important;
+                    height:50px !important;
+                }
+            </style>
 <style scoped>
+
+
+
 .el-row {
     margin-bottom: 20px;
 }
@@ -485,4 +528,5 @@ export default {
     width: 100%;
     height: 300px;
 }
+
 </style>
